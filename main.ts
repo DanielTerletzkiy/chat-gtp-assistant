@@ -1,11 +1,9 @@
-import {pipeline, Readable, Stream} from "stream";
+import {Readable, Stream} from "stream";
 
 const fetch = require('node-fetch');
 const vosk = require('vosk')
 const fs = require("fs");
-let Mic = require('node-microphone');
 const SAMPLE_RATE = 44100
-let mic = new Mic({/*bitwidth: 16, rate: SAMPLE_RATE, endian: 'big'*/});
 const Speaker = require('speaker');
 const googleTTS = require('google-tts-api');
 const sox = require('sox-stream')
@@ -15,6 +13,7 @@ let chalk;
 import('chalk').then((value)=>{
     chalk = value.default;
 })
+const mic = require('mic');
 
 const MODEL_PATH = "./model/vosk-model-en-us-0.22"
 //const MODEL_PATH = "./model/vosk-model-small-en-us-0.15"
@@ -120,22 +119,31 @@ async function main() {
 }
 
 function start() {
-    let micStream = mic.startRecording();
+    const micInstance = mic({
+        channels: '1',
+        debug: false,
+        exitOnSilence: 6
+    });
+    let micInputStream = micInstance.getAudioStream();
+
     console.log(chalk.bgGreen.black(' STARTED listening '));
 
     playWavFile('bleep');
 
-    micStream.on('error', function () {
-        stop();
+    micInputStream.on('error', function(err) {
+        console.log("Error in Input Stream: " + err);
     });
 
-    setTimeout(() => {
+    micInputStream.on('silence', function() {
+        console.log("Got SIGNAL silence");
         playWavFile('endBleep');
         console.log(chalk.bgYellow.black(' STOPPED listening '));
-        mic.stopRecording();
-    }, 10000)
+        micInstance.stop();
+    });
 
-    return micStream;
+    micInstance.start();
+
+    return micInputStream;
 }
 
 function playWavFile(fileName: string) {
