@@ -135,7 +135,6 @@ function start() {
     });
 
     micInputStream.on('silence', function() {
-        console.log("Got SIGNAL silence");
         playWavFile('endBleep');
         console.log(chalk.bgYellow.black(' STOPPED listening '));
         micInstance.stop();
