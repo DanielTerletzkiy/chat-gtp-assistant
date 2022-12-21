@@ -15,9 +15,9 @@ import('chalk').then((value)=>{
 })
 const mic = require('mic');
 
-const MODEL_PATH = "./model/vosk-model-en-us-0.22"
-//const MODEL_PATH = "./model/vosk-model-small-en-us-0.15"
-//const MODEL_PATH = "./model/vosk-model-de-0.21"
+//const MODEL_PATH = "./model/vosk-model-en-us-0.22"; const LANGUAGE = "en"
+//const MODEL_PATH = "./model/vosk-model-small-en-us-0.15"; const LANGUAGE = "en"
+const MODEL_PATH = "./model/vosk-model-de-0.21"; const LANGUAGE = "de"
 
 if (!fs.existsSync(MODEL_PATH)) {
     console.log("Please download the model from https://alphacephei.com/vosk/models and unpack as " + MODEL_PATH + " in the current folder.")
@@ -78,7 +78,7 @@ async function main() {
 
     const urls = googleTTS
         .getAllAudioUrls(chatResult.response, {
-            lang: 'en',
+            lang: LANGUAGE,
             slow: false,
             host: 'https://translate.google.com'
         })

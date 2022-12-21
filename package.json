@@ -14,7 +14,7 @@
     "async": "^3.2.0",
     "base64-stream": "^1.0.0",
     "chalk": "^5.2.0",
-    "chatgpt": "^3.2.4",
+    "chatgpt": "^3.3.1",
     "concat-stream": "^2.0.0",
     "dotenv": "^16.0.3",
     "ffi-napi": "^4.0.3",
