@@ -10,28 +10,29 @@ const sox = require('sox-stream')
 require('dotenv').config();
 const getMP3Duration = require('get-mp3-duration')
 let chalk;
-import('chalk').then((value)=>{
+import('chalk').then((value) => {
     chalk = value.default;
 })
 const mic = require('mic');
 
-//const MODEL_PATH = "./model/vosk-model-en-us-0.22"; const LANGUAGE = "en"
+const MODEL_PATH = "./model/vosk-model-en-us-0.22"; const LANGUAGE = "en"
 //const MODEL_PATH = "./model/vosk-model-small-en-us-0.15"; const LANGUAGE = "en"
-const MODEL_PATH = "./model/vosk-model-de-0.21"; const LANGUAGE = "de"
+//const MODEL_PATH = "./model/vosk-model-de-0.21"; const LANGUAGE = "de"
 
 if (!fs.existsSync(MODEL_PATH)) {
     console.log("Please download the model from https://alphacephei.com/vosk/models and unpack as " + MODEL_PATH + " in the current folder.")
     process.exit()
 }
 
-vosk.setLogLevel(0);
-const model = new vosk.Model(MODEL_PATH);
-const rec = new vosk.Recognizer({model: model, sampleRate: SAMPLE_RATE});
-
 let api;
 let chatResult;
+let rec;
+let model;
 
 (async function () {
+    vosk.setLogLevel(0);
+    model = await new vosk.Model(MODEL_PATH);
+    rec = new vosk.Recognizer({model: model, sampleRate: SAMPLE_RATE});
     await initChatGpt();
     await main();
 })()
@@ -49,7 +50,7 @@ async function initChatGpt() {
     api = new ChatGPTAPIBrowser({
         email: process.env.OPENAI_EMAIL,
         password: process.env.OPENAI_PASSWORD,
-        executablePath: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        executablePath: process.env.CHROME_PATH,
     })
 
     await api.initSession()
@@ -80,7 +81,8 @@ async function main() {
         .getAllAudioUrls(chatResult.response, {
             lang: LANGUAGE,
             slow: false,
-            host: 'https://translate.google.com'
+            host: 'https://translate.google.com',
+            splitPunct: ',.?'
         })
 
     let bodies = []
@@ -130,11 +132,11 @@ function start() {
 
     playWavFile('bleep');
 
-    micInputStream.on('error', function(err) {
+    micInputStream.on('error', function (err) {
         console.log("Error in Input Stream: " + err);
     });
 
-    micInputStream.on('silence', function() {
+    micInputStream.on('silence', function () {
         playWavFile('endBleep');
         console.log(chalk.bgYellow.black(' STOPPED listening '));
         micInstance.stop();

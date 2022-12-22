@@ -12,10 +12,11 @@ the default system speaker
     ```dotenv
         OPENAI_EMAIL="your_email"
         OPENAI_PASSWORD="your_password"
+        CHROME_PATH="your_chrome_path"
     ```
 2. `npm install`
-3. install `sox` (if on windows)
-4. install preferred `vosk` models for speech recognition, put them into `models/` folder
+3. install `sox` (if on windows) and libmad-0.dll for sox
+4. install preferred `vosk` models for speech recognition, put them into `model/` folder
 5. resolve other missing dependencies
 6. `npm run dev`
 
